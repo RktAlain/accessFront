@@ -1,38 +1,40 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { AuthService } from '@/lib/authService';
-import { useNavigate } from 'react-router-dom';
-import { json } from 'stream/consumers';
-
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { AuthService } from "@/lib/authService";
+import { useNavigate } from "react-router-dom";
+import { json } from "stream/consumers";
 
 interface User {
   id: string;
-  nom:string;
+  nom: string;
   email: string;
   role: string;
 }
 const Login = () => {
   const [utilisateur, setUtilisateur] = useState({
-    email: '',
-    mdp: '',
-    role: '',
-    nom:''
+    email: "",
+    mdp: "",
+    role: "",
+    nom: "",
   });
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const canvasRef = useRef<HTMLDivElement>(null)
+  const canvasRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
 
   // Initialisation de la scène 3D
   useEffect(() => {
     if (!canvasRef.current) return;
 
-
     // Configuration de la scène Three.js
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -45,7 +47,7 @@ const Login = () => {
     const nodeMaterial = new THREE.MeshBasicMaterial({
       color: 0x4f46e5,
       transparent: true,
-      opacity: 0.8
+      opacity: 0.8,
     });
 
     // Création des noeuds
@@ -64,16 +66,17 @@ const Login = () => {
     const lineMaterial = new THREE.LineBasicMaterial({
       color: 0x818cf8,
       transparent: true,
-      opacity: 0.3
+      opacity: 0.3,
     });
 
     nodes.forEach((node, i) => {
       const connections = Math.floor(Math.random() * 3) + 1;
       for (let j = 0; j < connections; j++) {
-        const targetIndex = (i + Math.floor(Math.random() * nodes.length)) % nodes.length;
+        const targetIndex =
+          (i + Math.floor(Math.random() * nodes.length)) % nodes.length;
         const geometry = new THREE.BufferGeometry().setFromPoints([
           node.position,
-          nodes[targetIndex].position
+          nodes[targetIndex].position,
         ]);
         const line = new THREE.Line(geometry, lineMaterial);
         lines.push(line);
@@ -88,7 +91,7 @@ const Login = () => {
         color: 0x3b82f6,
         wireframe: true,
         transparent: true,
-        opacity: 0.5
+        opacity: 0.5,
       })
     );
     scene.add(dataCube);
@@ -108,7 +111,7 @@ const Login = () => {
       requestAnimationFrame(animate);
 
       // Animation des noeuds
-      nodes.forEach(node => {
+      nodes.forEach((node) => {
         node.position.x += (Math.random() - 0.5) * 0.01;
         node.position.y += (Math.random() - 0.5) * 0.01;
         node.position.z += (Math.random() - 0.5) * 0.01;
@@ -126,7 +129,10 @@ const Login = () => {
 
     // Nettoyage
     return () => {
-      if (canvasRef.current && canvasRef.current.contains(renderer.domElement)) {
+      if (
+        canvasRef.current &&
+        canvasRef.current.contains(renderer.domElement)
+      ) {
         canvasRef.current.removeChild(renderer.domElement);
       }
     };
@@ -142,16 +148,16 @@ const Login = () => {
 
       const user: User = {
         id: response.id,
-        nom:response.nom,
+        nom: response.nom,
         email: response.email,
-        role: response.role
-      }
-      localStorage.setItem('user', JSON.stringify(user));
-      navigate('/dashboard');
+        role: response.role,
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+      navigate("/dashboard");
     } catch (error) {
-      console.error('Échec de la connexion:', error);
+      console.error("Échec de la connexion:", error);
     }
-
+    navigate("/dashboard");
     // Simulation de l'authentification
     setTimeout(() => {
       setIsAuthenticating(false);
@@ -159,18 +165,17 @@ const Login = () => {
     }, 2000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setUtilisateur(prev => ({ ...prev, [name]: value }));
+    setUtilisateur((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Fond 3D avec Three.js */}
-      <div
-        ref={canvasRef}
-        className="fixed inset-0 z-0 opacity-80"
-      />
+      <div ref={canvasRef} className="fixed inset-0 z-0 opacity-80" />
 
       {/* Interface de connexion */}
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
@@ -192,8 +197,12 @@ const Login = () => {
                 <div className="flex justify-center mb-6">
                   <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
                 </div>
-                <h3 className="text-xl font-bold text-blue-400 mb-2">Vérification en cours</h3>
-                <p className="text-gray-300">Authentification de vos identifiants...</p>
+                <h3 className="text-xl font-bold text-blue-400 mb-2">
+                  Vérification en cours
+                </h3>
+                <p className="text-gray-300">
+                  Authentification de vos identifiants...
+                </p>
               </motion.div>
             ) : (
               <motion.div
@@ -209,7 +218,9 @@ const Login = () => {
                   <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">
                     PORTAIL EXECUTIVE
                   </h1>
-                  <p className="text-blue-200/70 mt-1 text-sm">Accès sécurisé au réseau d'entreprise</p>
+                  <p className="text-blue-200/70 mt-1 text-sm">
+                    Accès sécurisé au réseau d'entreprise
+                  </p>
                 </div>
 
                 {/* Formulaire */}
@@ -224,11 +235,21 @@ const Login = () => {
                         onChange={handleChange}
                         className="w-full px-4 py-3 bg-gray-800/50 text-white placeholder-gray-400 rounded-lg border border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
                         placeholder="E-mail"
-                        required
+                        
                       />
                       <div className="absolute right-3 top-3 text-blue-400">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
                         </svg>
                       </div>
                     </div>
@@ -242,11 +263,21 @@ const Login = () => {
                         onChange={handleChange}
                         className="w-full px-4 py-3 bg-gray-800/50 text-white placeholder-gray-400 rounded-lg border border-gray-700 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
                         placeholder="Mot de passe"
-                        required
+                        
                       />
                       <div className="absolute right-3 top-3 text-purple-400">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                          />
                         </svg>
                       </div>
                     </div>
@@ -258,18 +289,38 @@ const Login = () => {
                         value={utilisateur.role}
                         onChange={handleChange}
                         className="w-full px-4 py-3 bg-gray-800/50 text-white rounded-lg border border-gray-700 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 appearance-none transition-all"
-                        required
+                        
                       >
-                        <option value="" disabled>Rôle utilisateur</option>
-                        <option value="Directeur General">Directeur Général</option>
-                        <option value="Departement financier">Département financier</option>
-                        <option value="Departement Stock">Département Stock</option>
-                        <option value="Departement Achat">Département Achat</option>
+                        <option value="" disabled>
+                          Rôle utilisateur
+                        </option>
+                        <option value="Directeur General">
+                          Directeur Général
+                        </option>
+                        <option value="Departement financier">
+                          Département financier
+                        </option>
+                        <option value="Departement Stock">
+                          Département Stock
+                        </option>
+                        <option value="Departement Achat">
+                          Département Achat
+                        </option>
                         <option value="Demandeur">Demandeur</option>
                       </select>
                       <div className="absolute right-3 top-3 text-emerald-400 pointer-events-none">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
                         </svg>
                       </div>
                     </div>
@@ -289,7 +340,8 @@ const Login = () => {
                 {/* Pied de page */}
                 <div className="px-6 py-4 bg-gray-900/50 text-center border-t border-gray-800">
                   <p className="text-xs text-gray-500">
-                    Système protégé © {new Date().getFullYear()} - Tous droits réservés
+                    Système protégé © {new Date().getFullYear()} - Tous droits
+                    réservés
                   </p>
                 </div>
               </motion.div>
