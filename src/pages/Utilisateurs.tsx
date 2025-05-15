@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
+import api from "@/lib/api";
 
 interface User {
   id: string;
@@ -80,13 +81,13 @@ const Utilisateurs = () => {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(
-        "http://localhost:8000/utilisateur/afficher_tous/"
+      const response = await api.get(
+        "/utilisateur/afficher_tous/"
       );
-      if (!response.ok) {
+      if (!response) {
         throw new Error("Erreur lors de la récupération des utilisateurs");
       }
-      const data = await response.json();
+      const data = await response.data;
       setUsers(data.data);
     } catch (error) {
       console.error("Erreur:", error);
@@ -151,7 +152,7 @@ const Utilisateurs = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/utilisateur/ajouter/",
+        "/utilisateur/ajouter/",
         {
           method: "POST",
           headers: {
@@ -198,7 +199,7 @@ const Utilisateurs = () => {
   const toggleUserStatus = async (userId: string, currentStatus: string) => {
     try {
       const isActive = currentStatus === "actif";
-      const endpoint = `http://localhost:8000/utilisateur/${
+      const endpoint = `/utilisateur/${
         isActive ? "desactiver" : "activer"
       }/${userId}/`;
   

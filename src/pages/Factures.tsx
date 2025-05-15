@@ -51,6 +51,7 @@ import {
 } from "lucide-react";
 import Webcam from "react-webcam";
 import { useLanguage } from "@/language-context";
+import api from "@/lib/api";
 
 interface Facture {
   _id: string;
@@ -99,13 +100,13 @@ const Factures = () => {
   useEffect(() => {
     const fetchFactures = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/facture/listeFactures/"
+        const response = await api.get(
+          "/facture/listeFactures/"
         );
-        if (!response.ok) {
+        if (!response) {
           throw new Error(translate("Erreur lors du chargement des factures"));
         }
-        const data = await response.json();
+        const data = response.data;
         setFactures(data.data);
         setLoading(false);
       } catch (err) {
@@ -160,8 +161,8 @@ const Factures = () => {
       // Créez un nouvel objet sans l'ID temporaire pour l'envoi au serveur
       const { _id, ...factureToSend } = newFacture;
 
-      const response = await fetch(
-        "http://localhost:8000/facture/ajouterFactures/",
+      const response = await api.post(
+        "/facture/ajouterFactures/",
         {
           method: "POST",
           headers: {
@@ -171,11 +172,11 @@ const Factures = () => {
         }
       );
 
-      if (!response.ok) {
+      if (!response) {
         throw new Error(translate("Erreur lors de l'ajout de la facture"));
       }
 
-      const result = await response.json();
+      const result = response.data;
 
       setFactures([
         ...factures,

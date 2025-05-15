@@ -21,6 +21,7 @@ import {
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useLanguage } from "@/language-context";
+import api from "@/lib/api";
 
 interface Demande {
   _id: string;
@@ -123,14 +124,14 @@ const Dashboard = () => {
       try {
         setLoading(true);
         
-        const articlesResponse = await axios.get("http://localhost:8000/articleStock/article/");
+        const articlesResponse = await api.get("/articleStock/article/");
         const articlesData: Article[] = articlesResponse.data.data;
         setArticles(articlesData);
 
         const alertes = articlesData.filter(a => a.quantite < a.seuil_alerte);
         setAlertesStockCount(alertes.length);
 
-        const demandesResponse = await axios.get("http://localhost:8000/demandeAchat/demandes/");
+        const demandesResponse = await api.get("/demandeAchat/demandes/");
         const demandes: Demande[] = demandesResponse.data.data;
 
         setEnAttenteCount(demandes.filter(d => d.status === "en_attente").length);
@@ -139,7 +140,7 @@ const Dashboard = () => {
           .sort((a, b) => new Date(b.dateDemande).getTime() - new Date(a.dateDemande).getTime())
           .slice(0, 4));
 
-        const budgetsResponse = await axios.get("http://localhost:8000/budget/listeBudgets/");
+        const budgetsResponse = await api.get("/budget/listeBudgets/");
         const budgets: Budget[] = budgetsResponse.data.data;
         
         const totalAlloue = budgets.reduce((sum, b) => sum + b.budget_alloue, 0);
@@ -148,8 +149,8 @@ const Dashboard = () => {
         setBudgetTotal(totalAlloue);
         setBudgetConsomme(totalConsomme);
 
-        const parDepartementResponse = await axios.get(
-          "http://localhost:8000/budget/montantsApprouvesParDepartement/"
+        const parDepartementResponse = await api.get(
+          "/budget/montantsApprouvesParDepartement/"
         );
         setBudgetParDepartement(parDepartementResponse.data.data);
 

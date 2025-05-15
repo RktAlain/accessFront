@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertCircle, ArrowDownUp, DownloadCloud, Eye, Plus, Settings, UploadCloud } from 'lucide-react';
 import { toast } from 'sonner';
 import {Navigate, useNavigate } from 'react-router-dom';
+import api from '@/lib/api';
 
 // Interface pour les articles en stock
 interface StockItem {
@@ -65,11 +66,11 @@ const GestionStocks = () => {
   useEffect(() => {
     const fetchStockData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/articleStock/article/');
-        if (!response.ok) {
+        const response = await api.get('/articleStock/article/');
+        if (!response) {
           throw new Error(`Erreur HTTP: ${response.status}`);
         }
-        const data = await response.json();
+        const data = await response.data;
         setStockData(data.data || []);
       } catch (err) {
         setError(prev => ({ ...prev, stock: err.message }));
@@ -81,11 +82,11 @@ const GestionStocks = () => {
 
     const fetchMouvementsData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/stockMouvement/stock/movement/');
-        if (!response.ok) {
+        const response = await api.get('/stockMouvement/stock/movement/');
+        if (!response) {
           throw new Error(`Erreur HTTP: ${response.status}`);
         }
-        const data = await response.json();
+        const data = response.data;
         setMouvementsData(data.data || []);
       } catch (err) {
         setError(prev => ({ ...prev, mouvements: err.message }));
@@ -227,8 +228,8 @@ const StockAjustementForm = () => {
  useEffect(() => {
   const fetchArticles = async () => {
     try {
-      const response = await fetch('http://localhost:8000/articleStock/article/');
-      const data = await response.json();
+      const response = await api.get('/articleStock/article/');
+      const data = response.data;
 
       // Vérification que 'data' est un tableau avant de le stocker
       if (Array.isArray(data.data)) {
@@ -255,7 +256,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   const actionToSend = type === 'entree' ? 'entrer' : 'retrait'; // Convertir 'entree' et 'sortie' en 'entrer' et 'retrait'
 
   try {
-    const response = await fetch(`http://localhost:8000/stockMouvement/stock/movement/${selectedArticle.id}/`, {
+    const response = await api.post(`/stockMouvement/stock/movement/${selectedArticle.id}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -268,7 +269,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       }),
     });
 
-    if (!response.ok) {
+    if (!response) {
       throw new Error('Erreur lors de l\'ajustement');
     }
 

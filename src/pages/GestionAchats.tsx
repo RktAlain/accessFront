@@ -30,6 +30,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import api from "@/lib/api";
 
 const departments = [
   "Informatique",
@@ -305,13 +306,13 @@ const GestionAchats = () => {
 
   const fetchDetailsDemande = async (reference: string) => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/achatDevis/detailsDemande/${reference}/`
+      const response = await api.get(
+        `/achatDevis/detailsDemande/${reference}/`
       );
-      if (!response.ok)
+      if (!response)
         throw new Error("Erreur lors de la récupération des détails");
 
-      const data = await response.json();
+      const data = response.data;
       if (data.status === "success") {
         return data.data;
       }
@@ -327,15 +328,15 @@ const GestionAchats = () => {
     setLoading(true);
     try {
       const [devisResponse, budgetsResponse] = await Promise.all([
-        fetch("http://localhost:8000/achatDevis/listeDevis/"),
-        fetch("http://localhost:8000/budget/budgetsDisponiblesParDepartement/"),
+        api.get("/achatDevis/listeDevis/"),
+        api.get("/budget/budgetsDisponiblesParDepartement/"),
       ]);
 
-      if (!devisResponse.ok)
+      if (!devisResponse)
         throw new Error("Erreur lors de la récupération des devis");
 
-      const devisData = await devisResponse.json();
-      const budgetsData = await budgetsResponse.json();
+      const devisData = devisResponse.data;
+      const budgetsData = budgetsResponse.data;
 
       if (budgetsData.status === "success") {
         const newBudgetDisponible = budgetsData.data.reduce(
@@ -391,13 +392,13 @@ const GestionAchats = () => {
 
   const fetchBudgetDisponible = async (departement: string) => {
     try {
-      const response = await fetch(
-        `http://localhost:8000/budget/budgetsDisponiblesParDepartement/`
+      const response = await api.get(
+        `/budget/budgetsDisponiblesParDepartement/`
       );
-      if (!response.ok)
+      if (!response)
         throw new Error("Erreur lors de la récupération des budgets");
 
-      const data = await response.json();
+      const data = response.data;
       if (data.status === "success") {
         const budgetDepartement = data.data.find(
           (b: any) => b.departement === departement
@@ -418,14 +419,14 @@ const GestionAchats = () => {
     if (name === "departement") {
       setLoadingReferences(true);
       try {
-        const referencesResponse = await fetch(
-          `http://localhost:8000/achatDevis/demandesParDepartement/${value}/`
+        const referencesResponse = await api.get(
+          `/achatDevis/demandesParDepartement/${value}/`
         );
 
-        if (!referencesResponse.ok)
+        if (!referencesResponse)
           throw new Error("Erreur lors de la récupération des demandes");
 
-        const referencesData = await referencesResponse.json();
+        const referencesData = referencesResponse.data;
 
         if (referencesData.status === "success") {
           setDemandesReferences(referencesData.references);
@@ -588,22 +589,22 @@ const GestionAchats = () => {
     formDataToSend.append("status_devis", statut);
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/achatDevis/ajouterDevis/",
+      const response = await api.post(
+        "/achatDevis/ajouterDevis/",
         {
           method: "POST",
           body: formDataToSend,
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+      if (!response) {
+        const errorData = await response.data.catch(() => ({}));
         throw new Error(
           errorData.message || "Erreur lors de l'enregistrement du devis"
         );
       }
 
-      const result = await response.json();
+      const result = await response.data;
 
       const newDevis: Devis = {
         _id: result.id,

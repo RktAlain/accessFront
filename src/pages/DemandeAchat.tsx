@@ -24,6 +24,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import axios from "axios";
 import { toast } from "sonner";
 import { useLanguage } from "@/language-context";
+import api from "@/lib/api";
 
 interface DemandeAchat {
   _id: string;
@@ -294,7 +295,7 @@ const DemandeAchat = () => {
     const fetchDemandes = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("http://localhost:8000/demandeAchat/demandes/");
+        const response = await api.get("/demandeAchat/demandes/");
         const demandesData = response.data.data.map((d: any) => ({
           _id: d.id,
           reference: d.reference,
@@ -323,7 +324,7 @@ const DemandeAchat = () => {
     const fetchDemandeDetails = async (ref: string) => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8000/demandeAchat/demandes/${ref}/`);
+        const response = await api.get(`/demandeAchat/demandes/${ref}/`);
         const demandeDetails = {
           _id: response.data.demande.id,
           ...response.data.demande,
@@ -393,7 +394,7 @@ const DemandeAchat = () => {
               <DemandeForm 
                 onSuccess={() => {
                   setActiveTab("liste");
-                  axios.get("http://localhost:8000/demandeAchat/demandes/")
+                  api.get("/demandeAchat/demandes/")
                     .then(response => {
                       const demandesData = response.data.data.map((d: any) => ({
                         _id: d.id,

@@ -18,6 +18,7 @@ import {
 import { toast } from 'sonner';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import api from '@/lib/api';
 
 function NouvelleArticle() {
   const [nom, setNom] = useState('');
@@ -35,7 +36,7 @@ function NouvelleArticle() {
   };
 
   // Notification toast
-  useEffect(() => {
+  useEffect(():any => {
     const toastId = toast.custom(
       (t) => (
         <div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow-lg">
@@ -80,8 +81,7 @@ function NouvelleArticle() {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/articleStock/articlescreate/', {
-        method: 'POST',
+      const response = await api.post('/articleStock/articlescreate/', {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -95,12 +95,12 @@ function NouvelleArticle() {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response) {
+        const errorData = response.data;
         throw new Error(errorData.message || 'Erreur lors de la création');
       }
 
-      const data = await response.json();
+      const data = response.data;
     //   toast.success(`Article ajouté: ${data.nom} (${data.reference})`, {
       toast.success(`Article ajouté`, {
         description: `Stock initial: ${data.quantite} ${data.unite}`

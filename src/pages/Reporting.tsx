@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart as RechartsLineChart, Line, PieChart as RechartsPieChart, Pie, Cell } from 'recharts';
 import axios from 'axios';
+import api from '@/lib/api';
 
 interface StatDemande {
   mois: string;
@@ -240,7 +241,7 @@ const Reporting = () => {
         setLoading(true);
         
         // Récupérer les budgets
-        const budgetsResponse = await axios.get("http://localhost:8000/budget/listeBudgets/");
+        const budgetsResponse = await api.get("/budget/listeBudgets/");
         setBudgets(budgetsResponse.data.data);
         
         // Calculer le montant total consommé
@@ -250,8 +251,8 @@ const Reporting = () => {
         setMontantTotal(totalConsomme);
 
         // Récupérer les dépenses par département
-        const depensesResponse = await axios.get(
-          "http://localhost:8000/budget/montantsApprouvesParDepartement/"
+        const depensesResponse = await api.get(
+          "/budget/montantsApprouvesParDepartement/"
         );
         setDepensesParDepartement(depensesResponse.data.data);
 
@@ -266,11 +267,11 @@ const Reporting = () => {
         setTopDepartements(topDepts);
 
         // Récupérer les articles
-        const articlesResponse = await axios.get("http://localhost:8000/articleStock/article/");
+        const articlesResponse = await api.get("/articleStock/article/");
         setArticles(articlesResponse.data.data);
 
         // Récupérer les demandes pour les autres statistiques
-        const demandesResponse = await axios.get("http://localhost:8000/demandeAchat/demandes/");
+        const demandesResponse = await api.get("/demandeAchat/demandes/");
         const demandes: Demande[] = demandesResponse.data.data;
 
         // Filtrer selon la période sélectionnée

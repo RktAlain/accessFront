@@ -29,6 +29,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import api from "@/lib/api";
 
 interface Devis {
   id: string;
@@ -297,10 +298,9 @@ const ValidationDialog = ({ devis }: { devis: Devis }) => {
     try {
       const references = reference_materiel.split(",").map((ref) => ref.trim());
 
-      const response = await fetch(
-        "http://localhost:8000/validationDemande/approverDemande/",
+      const response = await api.post(
+        "/validationDemande/approverDemande/",
         {
-          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
@@ -310,14 +310,14 @@ const ValidationDialog = ({ devis }: { devis: Devis }) => {
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!response) {
+        const errorData = response.data;
         throw new Error(
           errorData.message || "Erreur lors de l'approbation des demandes"
         );
       }
 
-      return await response.json();
+      return response.data;
     } catch (error) {
       console.error("Erreur lors de l'approbation des demandes:", error);
       throw error;
@@ -336,26 +336,25 @@ const ValidationDialog = ({ devis }: { devis: Devis }) => {
       const formData = new FormData();
       formData.append("photo_signature", blob, "signature.png");
 
-      const updateResponse = await fetch(
-        `http://localhost:8000/validationDemande/majPhotoDevis/${devis.id}/`,
+      const updateResponse = await api.post(
+        `/validationDemande/majPhotoDevis/${devis.id}/`,
         {
-          method: "POST",
           body: formData,
         }
       );
 
-      if (!updateResponse.ok) {
-        const errorData = await updateResponse.json();
+      if (!updateResponse) {
+        const errorData = await updateResponse.data;
         throw new Error(errorData.message || "Erreur lors de la mise à jour");
       }
 
       // 2. Mettre à jour les demandes associées
       await approverDemandeAchat(devis.reference_materiel);
 
-      const budgetResponse = await fetch(
-        "http://localhost:8000/budget/montantsApprouvesParDepartement/"
+      const budgetResponse = await api.put(
+        "/budget/montantsApprouvesParDepartement/"
       );
-      if (!budgetResponse.ok) {
+      if (!budgetResponse) {
         throw new Error(
           "Erreur lors de la récupération des données budgétaires"
         );
@@ -532,12 +531,12 @@ const ValidationDemandes = () => {
   useEffect(() => {
     const fetchDevis = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/validationDemande/listeValidations/"
+        const response = await api.get(
+          "/validationDemande/listeValidations/"
         );
-        if (!response.ok) throw new Error("Erreur réseau");
+        if (!response) throw new Error("Erreur réseau");
 
-        const data = await response.json();
+        const data = response.data;
 
         if (data.status === "success") {
           setDevis(

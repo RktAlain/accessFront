@@ -26,6 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import axios from "axios";
 import { toast } from "sonner";
 import { useLanguage } from "@/language-context";
+import api from "@/lib/api";
 
 const formSchema = z.object({
   natureDemande: z.string().min(2, {
@@ -111,8 +112,7 @@ export function DemandeForm({ onSuccess }: DemandeFormProps) {
         formData.append("pieceJustificative", file);
       }
 
-      const response = await axios.post(
-        "http://localhost:8000/demandeAchat/creer/",
+      const response = await api.post("/demandeAchat/creer/",
         formData,
         {
           headers: {

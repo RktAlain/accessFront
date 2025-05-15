@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { useLanguage } from '@/language-context';
+import api from '@/lib/api';
 
 interface BudgetDepartement {
   id: string;
@@ -236,8 +237,8 @@ const Budgets = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const response = await fetch('http://localhost:8000/budget/listeBudgets/');
-        const data = await response.json();
+        const response = await api.get('/budget/listeBudgets/');
+        const data =  response.data;
         
         if (data.status === 'success') {
           setBudgetsDepartements(data.data.map((budget: any) => ({
@@ -256,8 +257,8 @@ const Budgets = () => {
 
     const chargerDevisApprouves = async () => {
       try {
-        const response = await fetch('http://localhost:8000/achatDevis/listeDevis/');
-        const data = await response.json();
+        const response = await api.get('/achatDevis/listeDevis/');
+        const data = response.data;
         
         if (data.status === 'success') {
           const devisFiltres = data.data
@@ -288,7 +289,7 @@ const Budgets = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('http://localhost:8000/budget/ajouterBudgets/', {
+      const response = await api.post('/budget/ajouterBudgets/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -300,11 +301,11 @@ const Budgets = () => {
         }),
       });
 
-      if (!response.ok) {
+      if (!response) {
         throw new Error(translate("Erreur lors de l'ajout du budget"));
       }
 
-      const updatedResponse = await fetch('http://localhost:8000/budget/listeBudgets/');
+      const updatedResponse = await fetch('/budget/listeBudgets/');
       const updatedData = await updatedResponse.json();
       
       if (updatedData.status === 'success') {
@@ -328,8 +329,8 @@ const Budgets = () => {
 
   const chargerDevisApprouves = async () => {
     try {
-      const response = await fetch('http://localhost:8000/devis/listeDevis/');
-      const data = await response.json();
+      const response = await api.get('/devis/listeDevis/');
+      const data = response.data;
       
       if (data.status === 'success') {
         const devisFiltres = data.data
